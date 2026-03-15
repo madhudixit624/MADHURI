@@ -1,0 +1,41 @@
+name: RAJ MISHRA BOT
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/10 * * * *"
+
+concurrency:
+  group: raj-mishra-bot
+  cancel-in-progress: false
+
+jobs:
+  bot-runner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350  # ~6 hours
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: pip install --upgrade pip && pip install requests
+
+      - name: Start Bot Loop
+        run: |
+          echo "=== RAJ MISHRA BOT STARTED ==="
+          export PYTHONUNBUFFERED=1
+
+          while true
+          do
+            echo "Starting main.py..."
+            # Safety: Timeout 330m, network or API stuck protection
+            timeout 330m python -u main.py || echo "Bot crashed/stuck. Restarting..."
+            echo "Restarting in 5 seconds..."
+            sleep 5
+          done
